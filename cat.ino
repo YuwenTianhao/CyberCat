@@ -1,11 +1,4 @@
-#include <soc/soc.h>
-#include <soc/rtc_cntl_reg.h>
-#include <Wire.h>
-#include <WiFi.h>
-#include <WiFiClient.h>
-#include <WiFiAP.h>
 #include <ESP32Servo.h>
-#include <BluetoothSerial.h>
 #define Addr 0x1C
 #define SDA 18
 #define SCL 19
@@ -29,7 +22,7 @@ int angleC33 = 46;//43  左前脚舵机
 int act = 1;
 const double pi = 3.1416; //设定运算常量圆周率
 const int servonum = 13; // 定义舵机数量
-BluetoothSerial SerialBT;
+
 Servo servo[servonum];
 char val;
 const int H = 70;     //步行姿态计算中的离地高度设定，详见“姿态计算解析”教程，请在网盘教程中寻找
@@ -37,13 +30,6 @@ const int hipL = 40; //步行姿态计算中的腿部零件长度，详见“姿
 const double legL = 58; //步行姿态计算中的脚部零件长度，详见“姿态计算解析”
 int soundTriggerPin = 23; //定义超声波模块针脚位置
 int soundEchoPin = 22; //定义超声波模块针脚位置
-String header;
-const char *ssid = "catcontrol"; //热点名称，自定义
-const char *password = "12345678";//连接密码，自定义
-void Task1code( void *pvParameters );
-void Task2code( void *pvParameters );
-//wifi在core0，其他在core1；1为大核
-WiFiServer server(80);
 
 void setup() {
   // put your setup code here, to run once:
@@ -64,45 +50,14 @@ void setup() {
   servo[10].attach(32, 500, 2500); //左前腿舵机，插引脚32，对应校对参数为angleC32
   servo[11].attach(33, 500, 2500); //左前脚舵机，插引脚33，对应校对参数为angleC33
   servo[12].attach(16, 500, 2500); //颈部舵机，插引脚16，对应校对参数为angleC16
-  SerialBT.begin("ESP32CAT");
   delay(100);
-  Wire.begin(SDA, SCL);
-  Wire.beginTransmission(Addr);
-  Wire.write(0x2A);
-  Wire.write((byte)0x00);
-  Wire.endTransmission();
-  Wire.beginTransmission(Addr);
-  Wire.write(0x2A);
-  Wire.write(0x01);
-  Wire.endTransmission();
-  Wire.beginTransmission(Addr);
-  Wire.write(0x0E);
-  Wire.write((byte)0x00);
-  Wire.endTransmission();
-
-  Serial.println();
-  Serial.println("Configuring access point...");
-  WiFi.softAP(ssid, password);//不写password，即热点开放不加密
-  IPAddress myIP = WiFi.softAPIP();//此为默认IP地址192.168.4.1，也可在括号中自行填入自定义IP地址
-  Serial.print("AP IP address:");
-  Serial.println(myIP);
-  server.begin();
-  Serial.println("Server started");
-  delay(300);
-  stand();
-  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);//关闭低电压检测,避免无限重启
-  xTaskCreatePinnedToCore(Task1, "Task1", 10000, NULL, 1, NULL,  0);  //最后一个参数至关重要，决定这个任务创建在哪个核上.PRO_CPU 为 0, APP_CPU 为 1,或者 tskNO_AFFINITY 允许任务在两者上运行.
-  xTaskCreatePinnedToCore(Task2, "Task2", 10000, NULL, 1, NULL,  1);//
-  //实现任务的函数名称（task1）；任务的任何名称（“ task1”等）；分配给任务的堆栈大小，以字为单位；任务输入参数（可以为NULL）；任务的优先级（0是最低优先级）；任务句柄（可以为NULL）；任务将运行的内核ID（0或1）
-
   delay(2000);
   int part1 = 1, part2 = 1, turncount = 0, turn = -1;
-
   if (part1)
   {
     Serial.println("1");
     stand();
-    vTaskDelay(500);
+    delay(500);
     int mark = 1;
     while (1) {
       if (turncount == 3) {
@@ -139,22 +94,22 @@ void setup() {
         }
       } else if (Cdistance <= 15) {              //如果测距数据小于15cm则转向，随机左转或右转
         int Rrdistance = RDistance();   //记录超声波测距数据
-        vTaskDelay(300);
+        delay(300);
         int Lldistance = LDistance();   //记录超声波测距数据
-        vTaskDelay(300);
+        delay(300);
         Serial.print(Lldistance);
         Serial.print("|");
         Serial.println(Rrdistance);
         if (Lldistance > Rrdistance) {
           for (int i = 0; i < 6; i++) {
-            vTaskDelay(100);
+            delay(100);
             turnleft();
             
           } turn = 0; turncount++;
         }
         if (Lldistance < Rrdistance) {
           for (int i = 0; i < 5; i++) {
-            vTaskDelay(100);
+            delay(100);
             turnright();
           } turn = 1; turncount++;
          
@@ -181,7 +136,7 @@ void setup() {
   }
   if (part2)
   {
-    vTaskDelay(300);
+    delay(300);
     while (1)
     {
       int left = LeftDistance();
@@ -193,12 +148,12 @@ void setup() {
       {
         if (left - right > 10)
         {
-          vTaskDelay(100);
+          delay(100);
           turnleft();
         }
         else if (right - left > 10)
         {
-          vTaskDelay(100);
+          delay(100);
           turnright();
         }
       }
@@ -235,14 +190,14 @@ void setup() {
     if (turn == 0) //开头左转
     {
       for (int i = 0; i < 5; i++) {
-        vTaskDelay(100);
+        delay(100);
         turnright();
       }
     }
     else
     {
       for (int i = 0; i < 6; i++) {
-        vTaskDelay(100);
+        delay(100);
         turnleft();
       }
     }
@@ -273,7 +228,7 @@ void setup() {
     //走到黄色星星处
 
     for (int i = 0; i < 11; i++) {
-      vTaskDelay(100);
+      delay(100);
       turnleft();
     }
 
@@ -296,17 +251,15 @@ void setup() {
     stopaction();
     delay(300);
     stand();
-    vTaskDelay(200);
+    delay(200);
     shakehands();
-    vTaskDelay(300);
+    delay(300);
 
     part2 = 0;
   }
 }
-
-void loop() {
-  // put your main code here, to run repeatedly:
-
+void loop(){
+ 
 }
 void balance()//判断是否偏离中心
 {
@@ -314,12 +267,12 @@ void balance()//判断是否偏离中心
   int right = RightDistance();
   if (left - right > 10)
   {
-    vTaskDelay(100);
+    delay(100);
     turnleft();
   }
   else if (right - left > 10)
   {
-    vTaskDelay(100);
+    delay(100);
     turnright();
   }
 }
@@ -420,7 +373,7 @@ void leftturn()
 {
   for (int i = 0; i < 6; i++)
   {
-    vTaskDelay(100);
+    delay(100);
     turnleft();
   }
 }
@@ -428,557 +381,8 @@ void rightturn()
 {
   for (int i = 0; i < 4; i++)
   {
-    vTaskDelay(100);
+    delay(100);
     turnright();
-  }
-}
-
-void Task1(void *pvParameters) {
-  //在这里可以添加一些代码，这样的话这个任务执行时会先执行一次这里的内容（当然后面进入while循环之后不会再执行这部分了）
-  while (1)
-  {
-    vTaskDelay(200);
-    WiFiClient client = server.available();  //监听连入设备
-    if (client) {
-      String currentLine = "";
-      while (client.connected()) {
-        if (client.available()) {
-          char c = client.read();
-          header += c;
-          if (c == '\n') {
-            if (currentLine.length() == 0) {
-              client.println("HTTP/1.1 200 OK");
-              client.println("Content-type:text/html");
-              client.println();
-              client.println("<!DOCTYPE html><html>");
-              client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
-              client.println("<meta charset=\"UTF-8\">");
-              client.println("<link rel=\"icon\" href=\"data:,\">");
-              client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
-              client.println(".button { background-color: #096625; border: none; color: white; padding: 20px 25px; ");
-              client.println("text-decoration: none; font-size: 18px; margin: 2px; cursor: pointer;}");
-              client.println(".button2 {background-color: #555555; border: none; color: white; padding: 16px 20px;text-decoration: none; font-size: 16px; margin: 1px; cursor: pointer;}</style></head>");
-              client.println("<body><h1>四足机器人控制</h1>");
-              client.println("<p><a href=\"/20/on\"><button class=\"button\">前进</button></a></p>");
-              client.println("<p><a href=\"/21/on\"><button class=\"button\">左转</button></a><a href=\"/22/on\"><button class=\"button\">停止</button></a><a href=\"/23/on\"><button class=\"button\">右转</button></a></p>");
-              client.println("<p><a href=\"/36/on\"><button class=\"button2\">左转头</button></a><a href=\"/24/on\"><button class=\"button\">后退</button></a><a href=\"/37/on\"><button class=\"button2\">右转头</button></a></p>");
-              client.println("<p><a href=\"/25/on\"><button class=\"button2\">步行</button></a><a href=\"/26/on\"><button class=\"button2\">坐姿</button></a><a href=\"/27/on\"><button class=\"button2\">握手</button></a><a  href=\"/28/on\"><button class=\"button2\">跟随</button></a></p>");
-              client.println("<p><a href=\"/29/on\"><button class=\"button2\">踏步</button></a><a href=\"/30/on\"><button class=\"button2\">摇摆</button></a><a href=\"/31/on\"><button class=\"button2\">起卧</button></a><a  href=\"/32/on\"><button class=\"button2\">踢球</button></a></p>");
-              client.println("<p><a href=\"/33/on\"><button class=\"button2\">自动行走</button></a><a href=\"/34/on\"><button class=\"button2\">站立平衡</button></a><a href=\"/35/on\"><button class=\"button2\">舵机校对</button></a></p>");
-              client.println("</body></html>");
-              client.println();
-              if (header.indexOf("GET /20/on") >= 0) {
-
-                Serial.println(val);
-                val = 'f';
-                Serial.println(val);
-              }
-              if (header.indexOf("GET /21/on") >= 0) {
-                val = 'l';
-                Serial.println(val);
-              }
-              if (header.indexOf("GET /22/on") >= 0) {
-                val = 'x';
-                Serial.println(val);
-                act = 2;
-              }
-              if (header.indexOf("GET /23/on") >= 0) {
-                val = 'r';
-                Serial.println(val);
-              }
-              if (header.indexOf("GET /24/on") >= 0) {
-                val = 'b';
-                Serial.println(val);
-              }
-              if (header.indexOf("GET /25/on") >= 0) {
-                val = 'w';
-                Serial.println(val);
-              }
-              if (header.indexOf("GET /26/on") >= 0) {
-                val = 't';
-                Serial.println(val);
-              }
-              if (header.indexOf("GET /27/on") >= 0) {
-                val = 'h';
-                Serial.println(val);
-              }
-              if (header.indexOf("GET /28/on") >= 0) {
-                val = 'm';
-                Serial.println(val);
-              }
-              if (header.indexOf("GET /29/on") >= 0) {
-                val = 's';
-                Serial.println(val);
-              }
-              if (header.indexOf("GET /30/on") >= 0) {
-                val = 'y';
-                Serial.println(val);
-              }
-              if (header.indexOf("GET /31/on") >= 0) {
-                val = 'u';
-                Serial.println(val);
-              }
-              if (header.indexOf("GET /32/on") >= 0) {
-                val = 'k';
-                Serial.println(val);
-              }
-              if (header.indexOf("GET /33/on") >= 0) {
-                val = 'a';
-                Serial.println(val);
-              }
-              if (header.indexOf("GET /34/on") >= 0) {
-                val = 'i';
-                Serial.println(val);
-              }
-              if (header.indexOf("GET /35/on") >= 0) {
-                val = 'c';
-                Serial.println(val);
-              }
-              if (header.indexOf("GET /36/on") >= 0) {
-                val = 'e';
-                Serial.println(val);
-              }
-              if (header.indexOf("GET /37/on") >= 0) {
-                val = 'g';
-                Serial.println(val);
-              }
-              break;
-            } else {
-              currentLine = ""; //如果收到是换行，则清空字符串变量
-            }
-          } else if (c != '\r') {
-            currentLine += c;
-          }
-
-        }
-        vTaskDelay(1);
-      }
-      header = "";
-      client.stop(); //断开连接
-    }
-  }
-}
-void Task2(void *pvParameters) {
-  while (1)
-  {
-    stand();
-    if (Serial.available() > 0) {
-      val = Serial.read();
-    }
-    if (SerialBT.available() > 0) {
-      val = SerialBT.read();
-    }
-    if (val == 'f') {
-      Serial.println("前进");
-      act = 1;
-      while (act == 1) {
-        servo[0].write(angleC2);
-        servo[3].write(angleC12);
-        servo[6].write(angleC15);
-        servo[9].write(angleC27);
-        runA(); //runA(),runB(),runC(),runD()是双脚离地步行姿态的四个运动阶段，详见教程“姿态计算解析”
-        runB();
-        runC();
-        runD();
-      }
-    }
-    if (val == 'c') {
-      Serial.println("calibration");
-      calibration();
-    }
-    if (val == 'b') {
-      Serial.println("后退");
-      act = 1;
-      while (act == 1) {
-        servo[0].write(angleC2);
-        servo[3].write(angleC12);
-        servo[6].write(angleC15);
-        servo[9].write(angleC27);
-        runbackA();
-        runbackB();
-        runbackC();
-        runbackD();
-      }
-    }
-    if (val == 'l') {
-      Serial.println("左转");
-      act = 1;
-      turnpreparation();
-      while (act == 1) {
-        turnleft();
-        stopaction();
-      }
-    }
-    if (val == 'r') {
-      Serial.println("右转");
-      act = 1;
-      turnpreparation();
-      while (act == 1) {
-        turnright();
-        stopaction();
-      }
-    }
-    if (val == 'w') {
-      Serial.println("步行");
-      stand();
-      act = 1;
-      while (act == 1) {
-        servo[0].write(angleC2);
-        servo[3].write(angleC12);
-        servo[6].write(angleC15);
-        servo[9].write(angleC27);
-        walkA();                      //引用"servocontrol.h"中的代码段，详见servocontrol.h页面相关内容。下同
-        walkB();
-        walkC();
-        walkD();
-      }
-    }
-    if (val == 's') {
-      Serial.println("踏步");
-      stand();
-      act = 1;
-      svmovea(1, angleC4 - 75);
-      svmoveb(4, angleC13 - 25);
-      svmoveb(7, angleC25 + 65);
-      svmovea(10, angleC32 + 35);
-      while (act == 1) {
-        servo[0].write(angleC2);
-        servo[3].write(angleC12);
-        servo[6].write(angleC15);
-        servo[9].write(angleC27);
-        stepwalk();
-        stopaction();
-      }
-    }
-    if (val == 't') {
-      Serial.println("坐姿");
-      vTaskDelay(200);
-      sit();
-      val = 'z';
-    }
-    if (val == 'g') {
-      vTaskDelay(500);
-      act = 1;
-      Serial.println("head turn right");
-      svmovea(12, angleC16 - 60);
-      vTaskDelay(1000);
-      while (act == 1) {
-        vTaskDelay(10);
-        stopaction();
-      }
-    }
-    if (val == 'e') {
-      vTaskDelay(500);
-      act = 1;
-      Serial.println("head turn left");
-      svmoveb(12, angleC16 + 60);
-      vTaskDelay(1000);
-      while (act == 1) {
-        vTaskDelay(10);
-        stopaction();
-      }
-    }
-    if (val == 'h') {
-      Serial.println("握手");
-      vTaskDelay(200);
-      act = 1;
-      shakehands();
-      vTaskDelay(300);
-      while (act == 1) {
-        for (int i = 50; i < 90; i++) {
-          servo[2].write(i);
-          vTaskDelay(15);
-        }
-        for (int i = 90; i > 50; i--) {
-          servo[2].write(i);
-          vTaskDelay(15);
-        }
-        vTaskDelay(200);
-        stopaction();
-      }
-    }
-    if (val == 'y') {
-      Serial.println("摇摆");
-      vTaskDelay(100);
-      act = 1;
-      turnpreparation();
-      vTaskDelay(500);
-      swingpreparation();
-      while (act == 1) {
-        swing();
-      }
-    }
-    if (val == 'u') {
-      Serial.println("起卧");
-      vTaskDelay(100);
-      act = 1;
-      stand();
-      vTaskDelay(500);
-      updownpreparation();
-      while (act == 1) {
-        updown();
-      }
-    }
-    if (val == 'k') {
-      Serial.println("踢球");
-      act = 1;
-      vTaskDelay(200);
-      kick();
-      val = 'z';
-    }
-    if (val == 'm') {
-      Serial.println("跟随");
-      stand();
-      act = 1;
-      vTaskDelay(200);
-      int a = 3;
-      while (act == 1) {
-        double Fdistance = CalculateDistance();  //记录超声波测距数据
-        Serial.println(Fdistance);
-        if (Fdistance < 8) {                     //如果超声波测得的距离小于5cm，则机器人后退
-          if (a != 2) {                           //这里设了一个变量开关，是因为发现当机器人在前进和后退这两个状态转换时有由于舵机突然加速而程序崩溃的风险。所以增加了此设定，即当程序发现有前进和后退状态的相互转变时则先进入站立姿态，再过渡到下个动作
-            vTaskDelay(100);
-            stand();
-            vTaskDelay(100);
-            servo[0].write(angleC2);
-            servo[3].write(angleC12);
-            servo[6].write(angleC15);
-            servo[9].write(angleC27);
-            runbackA();
-            runbackB();
-            runbackC();
-            runbackD();
-            a = 2;
-            Serial.println("back");
-            Serial.println(a);
-          } else if (a == 2) {
-            servo[0].write(angleC2);
-            servo[3].write(angleC12);
-            servo[6].write(angleC15);
-            servo[9].write(angleC27);
-            runbackA();
-            runbackB();
-            runbackC();
-            runbackD();
-            Serial.println(a);
-          }
-        }
-        else if (Fdistance > 8 && Fdistance < 30) { //如果超声波测得的距离大于6cm，小于15cm，则机器人前进
-          if (a != 1) {
-            vTaskDelay(100);
-            stand();
-            vTaskDelay(100);
-            servo[0].write(angleC2);
-            servo[3].write(angleC12);
-            servo[6].write(angleC15);
-            servo[9].write(angleC27);
-            runA();
-            runB();
-            runC();
-            runD();
-            a = 1;
-            Serial.println("前进");
-            Serial.println(a);
-          } else if (a == 1) {
-            servo[0].write(angleC2);
-            servo[3].write(angleC12);
-            servo[6].write(angleC15);
-            servo[9].write(angleC27);
-            runA();
-            runB();
-            runC();
-            runD();
-            Serial.println(a);
-          }
-        }
-        stopaction();
-        vTaskDelay(10);
-      }
-    }
-    if (val == 'a') {
-      Serial.println("自动行走");
-      act = 1;
-      stand();
-      vTaskDelay(500);
-      while (act == 1) {
-        double Fdistance = CalculateDistance();   //记录超声波测距数据
-        Serial.println(Fdistance);
-        if (Fdistance > 20) {                     //如果测距数据大于20cm则前进
-          servo[0].write(angleC2);
-          servo[3].write(angleC12);
-          servo[6].write(angleC15);
-          servo[9].write(angleC27);
-          runA();
-          runB();
-          runC();
-          runD();
-        } else if (Fdistance <= 20) {              //如果测距数据小于20cm则转向，随机左转或右转
-          vTaskDelay(300);
-          svmovea(12, angleC16 - 60);
-          vTaskDelay(300);
-          double Rdistance = CalculateDistance();   //记录超声波测距数据
-          vTaskDelay(300);
-          svmoveb(12, angleC16 + 60);
-          vTaskDelay(300);
-          double Ldistance = CalculateDistance();   //记录超声波测距数据
-          vTaskDelay(300);
-          Serial.print(Rdistance);
-          Serial.print("|");
-          Serial.println(Ldistance);
-          if (Ldistance > Rdistance) {
-            for (int i = 0; i < 6; i++) {
-              vTaskDelay(100);
-              turnleft();
-            }
-          }
-          if (Ldistance < Rdistance) {
-            for (int i = 0; i < 4; i++) {
-              vTaskDelay(100);
-              turnright();
-            }
-          }
-          servo[12].write(angleC16);
-        }
-        stopaction();
-      }
-    }
-    if (val == 'i') {
-      Serial.println("站立平衡");
-      vTaskDelay(100);
-      act = 1;
-      stand();
-      int isv1 = angleC4 - 50;
-      int isv2 = angleC5 - 85;
-      int isv4 = angleC13 - 45;
-      int isv5 = angleC14 - 73;
-      int isv7 = angleC25 + 45;
-      int isv8 = angleC26 + 73;
-      int isv10 = angleC32 + 50;
-      int isv11 = angleC33 + 85;
-      vTaskDelay(2000);
-      while (act == 1) {
-        unsigned int data[7];
-        Wire.requestFrom(Addr, 7);
-        if (Wire.available() == 7) {
-          data[0] = Wire.read();
-          data[1] = Wire.read();
-          data[2] = Wire.read();
-          data[3] = Wire.read();
-          data[4] = Wire.read();
-          data[5] = Wire.read();
-          data[6] = Wire.read();
-        }
-        int yAccl = ((data[3] * 256) + data[4]) / 16;
-        if (yAccl > 2047) {
-          yAccl -= 4096;
-        }
-        int xAccl = ((data[1] * 256) + data[2]) / 16;
-        if (xAccl > 2047) {
-          xAccl -= 4096;
-        }
-        Serial.print("Acceleration in X-Axis : ");
-        Serial.println(xAccl);
-        Serial.print("Acceleration in Y-Axis : ");
-        Serial.println(yAccl);
-
-        if (servo[2].read() < 150 && servo[5].read() < 150 && servo[8].read() > 20 && servo[11].read() > 20) {
-          if (yAccl < -50) {
-            isv1 = isv1 + 1;
-            servo[1].write(isv1);
-            isv2 = isv2 + 2;
-            servo[2].write(isv2);
-            isv4 = isv4 - 1;
-            servo[4].write(isv4);
-            isv5 = isv5 - 2;
-            servo[5].write(isv5);
-            isv7 = isv7 + 1;
-            servo[7].write(isv7);
-            isv8 = isv8 + 2;
-            servo[8].write(isv8);
-            isv10 = isv10 - 1;
-            servo[10].write(isv10);
-            isv11 = isv11 - 2;
-            servo[11].write(isv11);
-            vTaskDelay(10);
-          }
-          if (yAccl > 100) {
-            isv1 = isv1 - 1;
-            servo[1].write(isv1);
-            isv2 = isv2 - 2;
-            servo[2].write(isv2);
-            isv4 = isv4 + 1;
-            servo[4].write(isv4);
-            isv5 = isv5 + 2;
-            servo[5].write(isv5);
-            isv7 = isv7 - 1;
-            servo[7].write(isv7);
-            isv8 = isv8 - 2;
-            servo[8].write(isv8);
-            isv10 = isv10 + 1;
-            servo[10].write(isv10);
-            isv11 = isv11 + 2;
-            servo[11].write(isv11);
-            vTaskDelay(10);
-          }
-          if (xAccl > 100) { //通过xAccl变化判定是否发生左右向倾斜，由于机器人本身不是完全水平，因此判断的区间设在>100和<-100，一旦判断倾斜则转动舵机来弥补这一倾斜
-            isv1 = isv1 + 1;
-            servo[1].write(isv1);
-            isv2 = isv2 + 2;
-            servo[2].write(isv2);
-            isv4 = isv4 + 1;
-            servo[4].write(isv4);
-            isv5 = isv5 + 2;
-            servo[5].write(isv5);
-            isv7 = isv7 + 1;
-            servo[7].write(isv7);
-            isv8 = isv8 + 2;
-            servo[8].write(isv8);
-            isv10 = isv10 + 1;
-            servo[10].write(isv10);
-            isv11 = isv11 + 2;
-            servo[11].write(isv11);
-            delay(10);
-          }
-
-          if (xAccl < -100) {
-            isv1 = isv1 - 1;
-            servo[1].write(isv1);
-            isv2 = isv2 - 2;
-            servo[2].write(isv2);
-            isv4 = isv4 - 1;
-            servo[4].write(isv4);
-            isv5 = isv5 - 2;
-            servo[5].write(isv5);
-            isv7 = isv7 - 1;
-            servo[7].write(isv7);
-            isv8 = isv8 - 2;
-            servo[8].write(isv8);
-            isv10 = isv10 - 1;
-            servo[10].write(isv10);
-            isv11 = isv11 - 2;
-            servo[11].write(isv11);
-            delay(10);
-          }
-        }
-        if (servo[2].read() >= 150) {
-          servo[2].write(150);
-        }
-        if (servo[5].read() >= 150) {
-          servo[5].write(150);
-        }
-        if (servo[8].read() <= 20) {
-          servo[8].write(20);
-        }
-
-        if (servo[11].read() <= 20) {
-          servo[11].write(20);
-        }
-        vTaskDelay(10);
-        stopaction();
-
-      }
-      vTaskDelay(100);
-    }
   }
 }
 
@@ -1062,13 +466,6 @@ void stand() //使机器人从任意状态转变到站立状态。
 void stopaction() {
   if (Serial.available() > 0) {
     val = Serial.read();
-    if (val == 'x' ) {            //则直接跳出这段一直循环重复的代码
-      act = 2;
-      stand();
-    }
-  }
-  if (SerialBT.available() > 0) {
-    val = SerialBT.read();
     if (val == 'x' ) {            //则直接跳出这段一直循环重复的代码
       act = 2;
       stand();
