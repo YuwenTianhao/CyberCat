@@ -138,9 +138,9 @@ void setup() {
           if (Cdistance <= 15)break;
         }
       } else if (Cdistance <= 15) {              //如果测距数据小于15cm则转向，随机左转或右转
-        int Rrdistance = RightDistance();   //记录超声波测距数据
+        int Rrdistance = RDistance();   //记录超声波测距数据
         vTaskDelay(300);
-        int Lldistance = LeftDistance();   //记录超声波测距数据
+        int Lldistance = LDistance();   //记录超声波测距数据
         vTaskDelay(300);
         Serial.print(Lldistance);
         Serial.print("|");
@@ -149,26 +149,19 @@ void setup() {
           for (int i = 0; i < 6; i++) {
             vTaskDelay(100);
             turnleft();
-            for (int i = 0; i < 5; i++)
-          {
-            servo[0].write(angleC2);
-            servo[3].write(angleC12);
-            servo[6].write(angleC15);
-            servo[9].write(angleC27);
-            runA();
-            runB();
-            runC();
-            runD();
-            int Cdistance = CalculateDistance();
-            if (Cdistance <= 15)break;
-          }
+            
           } turn = 0; turncount++;
         }
         if (Lldistance < Rrdistance) {
           for (int i = 0; i < 5; i++) {
             vTaskDelay(100);
             turnright();
-            for (int i = 0; i < 5; i++)
+          } turn = 1; turncount++;
+         
+        }
+        servo[12].write(angleC16);
+        delay(300);
+        for (int i = 0; i < 5; i++)
           {
             servo[0].write(angleC2);
             servo[3].write(angleC12);
@@ -178,12 +171,8 @@ void setup() {
             runB();
             runC();
             runD();
-            int Cdistance = CalculateDistance();
-            if (Cdistance <= 15)break;
           }
-          } turn = 1; turncount++;
-        }
-        servo[12].write(angleC16);
+        
       }
       stopaction();
     }
@@ -215,7 +204,7 @@ void setup() {
       }
       else if (left > 50 && right > 50)
       {
-        for (int i = 0; i < 1; i++)
+        for (int i = 0; i < 3; i++)
         {
           servo[0].write(angleC2);
           servo[3].write(angleC12);
@@ -263,6 +252,8 @@ void setup() {
       if (juli >= 20)
       {
         balance();
+        for(int i = 0; i < 7; i++)
+        {
         servo[0].write(angleC2);
         servo[3].write(angleC12);
         servo[6].write(angleC15);
@@ -271,6 +262,7 @@ void setup() {
         runB();
         runC();
         runD();
+        }
       }
       else
       {
@@ -323,8 +315,6 @@ void balance()//判断是否偏离中心
   if (left - right > 10)
   {
     vTaskDelay(100);
-    turnleft();
-    vTaskDelay(50);
     turnleft();
   }
   else if (right - left > 10)
@@ -387,6 +377,38 @@ int RightDistance()//右扭头测距
   {
     //if(Time+500<millis()&&Time+1500>millis()){Rdistance=CalculateDistance();}
     servo[12].write(angleC16 - 60);
+    delay(5);
+  }
+  Rdistance = CalculateDistance();
+  Serial.println(Rdistance);
+  svmoveb(12, angleC16);
+  return Rdistance;
+}
+int LDistance()//左扭头测距
+{
+  svmoveb(12, angleC16 + 75 );
+  int Ldistance;
+  unsigned long Time = millis();
+  while (Time + 3000 > millis())
+  {
+    //if(Time+500<millis()&&Time+1500>millis()){Ldistance=CalculateDistance();}
+    servo[12].write(angleC16 + 75 );
+    delay(5);
+  }
+  Ldistance = CalculateDistance();
+  Serial.println(Ldistance);
+  svmovea(12, angleC16);
+  return Ldistance;
+}
+int RDistance()//右扭头测距
+{
+  svmovea(12, angleC16 - 75);
+  int Rdistance;
+  unsigned long Time = millis();
+  while (Time + 3000 > millis())
+  {
+    //if(Time+500<millis()&&Time+1500>millis()){Rdistance=CalculateDistance();}
+    servo[12].write(angleC16 - 75);
     delay(5);
   }
   Rdistance = CalculateDistance();
