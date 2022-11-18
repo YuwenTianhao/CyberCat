@@ -30,7 +30,7 @@ const int hipL = 40; //步行姿态计算中的腿部零件长度，详见“姿
 const double legL = 58; //步行姿态计算中的脚部零件长度，详见“姿态计算解析”
 int soundTriggerPin = 23; //定义超声波模块针脚位置
 int soundEchoPin = 22; //定义超声波模块针脚位置
-
+int count=0;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -73,13 +73,13 @@ void setup() {
 
         if (Cdistance > 40)
         {
-          if (turncount != 0)
+          if ( count!= 0)
           {
             balance();
           }
           servo[12].write(angleC16);
         }
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 5; i++)
         {
           servo[0].write(angleC2);
           servo[3].write(angleC12);
@@ -92,6 +92,7 @@ void setup() {
           Cdistance = CalculateDistance();
           if (Cdistance <= 15)break;
         }
+        count=1;
       } else if (Cdistance <= 15) {              //如果测距数据小于15cm则转向，随机左转或右转
         int Rrdistance = RDistance();   //记录超声波测距数据
         delay(300);
@@ -101,14 +102,14 @@ void setup() {
         Serial.print("|");
         Serial.println(Rrdistance);
         if (Lldistance > Rrdistance) {
-          for (int i = 0; i < 6; i++) {
+          for (int i = 0; i < 7; i++) {
             delay(100);
             turnleft();
             
           } turn = 0; turncount++;
         }
         if (Lldistance < Rrdistance) {
-          for (int i = 0; i < 5; i++) {
+          for (int i = 0; i < 4; i++) {
             delay(100);
             turnright();
           } turn = 1; turncount++;
@@ -134,129 +135,130 @@ void setup() {
     part1 = 0;
     part2 = 1;
   }
-  if (part2)
-  {
-    delay(300);
-    while (1)
-    {
-      int left = LeftDistance();
-      int right = RightDistance();
-      Serial.print(left);
-      Serial.print("--");
-      Serial.println(right);
-      if (left < 50 || right < 50)
-      {
-        if (left - right > 10)
-        {
-          delay(100);
-          turnleft();
-        }
-        else if (right - left > 10)
-        {
-          delay(100);
-          turnright();
-        }
-      }
-      else if (left > 50 && right > 50)
-      {
-        for (int i = 0; i < 3; i++)
-        {
-          servo[0].write(angleC2);
-          servo[3].write(angleC12);
-          servo[6].write(angleC15);
-          servo[9].write(angleC27);
-          runA();
-          runB();
-          runC();
-          runD();
-        }
-        break;
-      }
-      for (int i = 0; i < 7; i++)
-      {
-        servo[0].write(angleC2);
-        servo[3].write(angleC12);
-        servo[6].write(angleC15);
-        servo[9].write(angleC27);
-        runA();
-        runB();
-        runC();
-        runD();
-      }
-    }
-
-
-
-    if (turn == 0) //开头左转
-    {
-      for (int i = 0; i < 5; i++) {
-        delay(100);
-        turnright();
-      }
-    }
-    else
-    {
-      for (int i = 0; i < 6; i++) {
-        delay(100);
-        turnleft();
-      }
-    }
-    while (1)
-    {
-      double juli = CalculateDistance();
-      if (juli >= 20)
-      {
-        balance();
-        for(int i = 0; i < 7; i++)
-        {
-        servo[0].write(angleC2);
-        servo[3].write(angleC12);
-        servo[6].write(angleC15);
-        servo[9].write(angleC27);
-        runA();
-        runB();
-        runC();
-        runD();
-        }
-      }
-      else
-      {
-        stopaction();
-        break;
-      }
-    }
-    //走到黄色星星处
-
-    for (int i = 0; i < 11; i++) {
-      delay(100);
-      turnleft();
-    }
-
-    for (int i = 0; i < 5; i++)
-    {
-      balance();
-      servo[12].write(angleC16);
-      for (i = 0; i < 10; i++)
-      {
-        servo[0].write(angleC2);
-        servo[3].write(angleC12);
-        servo[6].write(angleC15);
-        servo[9].write(angleC27);
-        runA();
-        runB();
-        runC();
-        runD();
-      }
-    }
-    stopaction();
-    delay(300);
-    stand();
-    delay(200);
-    shakehands();
-    delay(300);
-
-    part2 = 0;
-  }
+//  if (part2)
+//  {
+//    delay(300);
+//    while (1)
+//    {
+//      int left = LeftDistance();
+//      int right = RightDistance();
+//      Serial.print(left);
+//      Serial.print("--");
+//      Serial.println(right);
+//      if (left < 50 || right < 50)
+//      {
+//        if (left - right > 10)
+//        {
+//          delay(100);
+//          turnleft();
+//        }
+//        else if (right - left > 10)
+//        {
+//          delay(100);
+//          turnright();
+//        }
+//        servo[12].write(angleC16);
+//      }
+//      else if (left > 50 && right > 50)
+//      {
+//        for (int i = 0; i < 3; i++)
+//        {
+//          servo[0].write(angleC2);
+//          servo[3].write(angleC12);
+//          servo[6].write(angleC15);
+//          servo[9].write(angleC27);
+//          runA();
+//          runB();
+//          runC();
+//          runD();
+//        }
+//        break;
+//      }
+//      for (int i = 0; i < 7; i++)
+//      {
+//        servo[0].write(angleC2);
+//        servo[3].write(angleC12);
+//        servo[6].write(angleC15);
+//        servo[9].write(angleC27);
+//        runA();
+//        runB();
+//        runC();
+//        runD();
+//      }
+//    }
+//
+//
+//
+//    if (turn == 0) //开头左转
+//    {
+//      for (int i = 0; i < 4; i++) {
+//        delay(100);
+//        turnright();
+//      }
+//    }
+//    else
+//    {
+//      for (int i = 0; i < 7; i++) {
+//        delay(100);
+//        turnleft();
+//      }
+//    }
+//    while (1)
+//    {
+//      double juli = CalculateDistance();
+//      if (juli >= 20)
+//      {
+//        balance();
+//        for(int i = 0; i < 7; i++)
+//        {
+//        servo[0].write(angleC2);
+//        servo[3].write(angleC12);
+//        servo[6].write(angleC15);
+//        servo[9].write(angleC27);
+//        runA();
+//        runB();
+//        runC();
+//        runD();
+//        }
+//      }
+//      else
+//      {
+//        stopaction();
+//        break;
+//      }
+//    }
+//    //走到黄色星星处
+//
+//    for (int i = 0; i < 14; i++) {
+//      delay(100);
+//      turnleft();
+//    }
+//
+//    for (int i = 0; i < 5; i++)
+//    {
+//      balance();
+//      servo[12].write(angleC16);
+//      for (i = 0; i < 10; i++)
+//      {
+//        servo[0].write(angleC2);
+//        servo[3].write(angleC12);
+//        servo[6].write(angleC15);
+//        servo[9].write(angleC27);
+//        runA();
+//        runB();
+//        runC();
+//        runD();
+//      }
+//    }
+//    stopaction();
+//    delay(300);
+//    stand();
+//    delay(200);
+//    shakehands();
+//    delay(300);
+//
+//    part2 = 0;
+//  }
 }
 void loop(){
  
@@ -276,21 +278,7 @@ void balance()//判断是否偏离中心
     turnright();
   }
 }
-int avg()//滤波
-{
-  int sum = 0, dismax = 0, dismin = 1000;
-  for (int i = 0; i < 7; i++)
-  {
-    int Distance = CalculateDistance();
-    if (dismax < Distance)dismax = Distance;
-    if (dismin > Distance)dismin = Distance;
-    sum = sum + Distance;
-    delay(300);
-  }
-  sum = sum - dismin - dismax;
-  sum = sum / 5;
-  return sum;
-}
+
 void runing(int x)//走
 {
   for (int i = 0; i < x; i++)
@@ -306,43 +294,65 @@ void runing(int x)//走
   }
 }
 int LeftDistance()//左扭头测距
-{
-  svmoveb(12, angleC16 + 60);
+{int a[7]={0},max_=0,min_=10000,num=0;
+  svmoveb(12, angleC16 + 75);
   int Ldistance;
   unsigned long Time = millis();
-  while (Time + 3000 > millis())
+  while (Time + 1500 > millis())
   {
     //if(Time+500<millis()&&Time+1500>millis()){Ldistance=CalculateDistance();}
-    servo[12].write(angleC16 + 60);
+    servo[12].write(angleC16 + 75);
+    if(num<7);{
+      a[num++]=CalculateDistance();
+      max_=(a[num-1]>max_)?a[num-1]:max_;
+      min_=(a[num-1]<min_)?a[num-1]:min_;
+    }
     delay(5);
   }
-  Ldistance = CalculateDistance();
+  for(int i=0;i<7;i++){
+    Ldistance+=a[i];
+  }
+  Ldistance-=min_;
+  Ldistance-=max_;
+  Ldistance/=5;
   Serial.println(Ldistance);
-  svmovea(12, angleC16);
+  svmoveb(12, angleC16);
   return Ldistance;
 }
 int RightDistance()//右扭头测距
-{
-  svmovea(12, angleC16 - 60);
+{int a[7]={0},max_=0,min_=10000,num=0;
+  svmovea(12, angleC16 - 75);
   int Rdistance;
   unsigned long Time = millis();
-  while (Time + 3000 > millis())
+  while (Time + 1500 > millis())
   {
     //if(Time+500<millis()&&Time+1500>millis()){Rdistance=CalculateDistance();}
-    servo[12].write(angleC16 - 60);
+    servo[12].write(angleC16 - 75);
+    if(num<7);{
+      a[num++]=CalculateDistance();
+      max_=(a[num-1]>max_)?a[num-1]:max_;
+      min_=(a[num-1]<min_)?a[num-1]:min_;
+    }
     delay(5);
   }
-  Rdistance = CalculateDistance();
+  
+  for(int i=0;i<7;i++){
+    Rdistance+=a[i];
+  }
+  Rdistance-=min_;
+  Rdistance-=max_;
+  Rdistance/=5;
   Serial.println(Rdistance);
   svmoveb(12, angleC16);
   return Rdistance;
+  
 }
 int LDistance()//左扭头测距
 {
   svmoveb(12, angleC16 + 75 );
   int Ldistance;
   unsigned long Time = millis();
-  while (Time + 3000 > millis())
+  while (Time + 1500 > millis())
   {
     //if(Time+500<millis()&&Time+1500>millis()){Ldistance=CalculateDistance();}
     servo[12].write(angleC16 + 75 );
@@ -353,12 +363,12 @@ int LDistance()//左扭头测距
   svmovea(12, angleC16);
   return Ldistance;
 }
-int RDistance()//右扭头测距
+int RDistance()//右扭头测距,保存的原始版本
 {
   svmovea(12, angleC16 - 75);
   int Rdistance;
   unsigned long Time = millis();
-  while (Time + 3000 > millis())
+  while (Time + 1500 > millis())
   {
     //if(Time+500<millis()&&Time+1500>millis()){Rdistance=CalculateDistance();}
     servo[12].write(angleC16 - 75);
@@ -379,7 +389,7 @@ void leftturn()
 }
 void rightturn()
 {
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < 3; i++)
   {
     delay(100);
     turnright();
@@ -394,6 +404,10 @@ int CalculateDistance()   //超声波模块测距，套用官方代码，返回�
   long duration = pulseIn(soundEchoPin, HIGH);
   float distance = duration * 0.017F;
   return int(distance);
+}
+int Cal_avg(){
+  int a,b,c,d,e,f,g;
+  
 }
 void svmovea(int sv, int angleA)
 {
