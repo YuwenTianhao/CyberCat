@@ -167,7 +167,7 @@ void setup() {
       }
       else if (left > 50 && right > 50)
       {
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 5; i++)
         {
           servo[0].write(angleC2);
           servo[3].write(angleC12);
