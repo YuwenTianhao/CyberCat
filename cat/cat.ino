@@ -52,7 +52,7 @@ void setup() {
   servo[12].attach(16, 500, 2500); //颈部舵机，插引脚16，对应校对参数为angleC16
   delay(100);
   delay(2000);
-  int part1 = 1, part2 = 1, turncount = 0, turn = -1;
+  int part1 = 1, part2 = 1, turncount = 0, turn = -1,turn_dis=17;
   if (part1)
   {
     Serial.println("1");
@@ -69,7 +69,7 @@ void setup() {
 
       Serial.println(Cdistance);
       Serial.println();
-      if (Cdistance > 15) { //如果测距数据大于15cm则前进
+      if (Cdistance > turn_dis) { //如果测距数据大于15cm则前进
 
         if (Cdistance > 40)
         {
@@ -90,10 +90,10 @@ void setup() {
           runC();
           runD();
           Cdistance = CalculateDistance();
-          if (Cdistance <= 15)break;
+          if (Cdistance <= turn_dis)break;
         }
         count=1;
-      } else if (Cdistance <= 15) {              //如果测距数据小于15cm则转向，随机左转或右转
+      } else if (Cdistance <= turn_dis) {              //如果测距数据小于15cm则转向，随机左转或右转
         int Rrdistance = RightDistance();   //记录超声波测距数据
         delay(300);
         int Lldistance = LeftDistance();   //记录超声波测距数据
@@ -299,7 +299,7 @@ int LeftDistance()//左扭头测距
 {
   int a[8]={0},max_=0,min_=10000,num=0;
   svmoveb(12, angleC16 + 75);
-  int Ldistance;
+  int Ldistance=0;
   unsigned long Time = millis();
   while (Time + 1500 > millis())
   {
@@ -307,7 +307,7 @@ int LeftDistance()//左扭头测距
     servo[12].write(angleC16 + 75);
     if(num<7){
       a[num++]=CalculateDistance();
-      Serial.print("右侧：");
+      Serial.print("左侧：");
       Serial.println(a[num-1]);
       max_=(a[num-1]>max_)?a[num-1]:max_;
       min_=(a[num-1]<min_)?a[num-1]:min_;
@@ -328,7 +328,7 @@ int RightDistance()//右扭头测距
 {
   int a[7]={0},max_=0,min_=10000,num=0;
   svmovea(12, angleC16 - 75);
-  int Rdistance;
+  int Rdistance=0;
   unsigned long Time = millis();
   while (Time + 1500 > millis())
   {
