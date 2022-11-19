@@ -163,6 +163,7 @@ void setup() {
           turnright();
         }
         servo[12].write(angleC16);
+
       }
       else if (left > 50 && right > 50)
       {
@@ -194,6 +195,7 @@ void setup() {
 
 
 
+
     if (turn == 0) //开头左转
     {
       for (int i = 0; i < 3; i++) {
@@ -208,14 +210,24 @@ void setup() {
         turnleft();
       }
     }
+    for (int i = 0; i < 5; i++) {
+      servo[0].write(angleC2);
+      servo[3].write(angleC12);
+      servo[6].write(angleC15);
+      servo[9].write(angleC27);
+      runA();
+      runB();
+      runC();
+      runD();
+    }
     while (1)
     {
       double juli = CalculateDistance();
-      if (juli >= 20)
+      if (juli >= 30)
       {
         balance();
         servo[12].write(angleC16);
-        for (int i = 0; i < 7; i++)
+        for (int i = 0; i < 5; i++)
         {
           servo[0].write(angleC2);
           servo[3].write(angleC12);
@@ -225,6 +237,10 @@ void setup() {
           runB();
           runC();
           runD();
+          juli = CalculateDistance();
+          if(juli<=30){
+            break;
+          }
         }
       }
       else
@@ -267,7 +283,7 @@ void setup() {
   }
 }
 void loop() {
-  
+
 }
 void balance()//判断是否偏离中心
 {
