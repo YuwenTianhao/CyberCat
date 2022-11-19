@@ -138,7 +138,7 @@ void setup() {
   part2 = 1;
   stand();
   delay(1000);
-  turn = 0;
+  turn = 1;
   delay(500);
   if (part2)
   {
@@ -251,13 +251,18 @@ void setup() {
       }
     }
     //走到黄色星星处
-
+    stopaction();
+    delay(300);
+    sit();
+    delay(300);
+    stand();
+    delay(300);
     for (int i = 0; i < 7; i++) {
       delay(100);
       turnright();
     }
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 6; i++)
     {
       balance();
       servo[12].write(angleC16);
