@@ -253,10 +253,9 @@ void setup() {
     //走到黄色星星处
     stopaction();
     delay(300);
-    sit();
-    delay(300);
-    stand();
-    delay(300);
+    updown();
+    updown();
+    updown();
     for (int i = 0; i < 7; i++) {
       delay(100);
       turnright();
