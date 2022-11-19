@@ -30,7 +30,7 @@ const int hipL = 40; //步行姿态计算中的腿部零件长度，详见“姿
 const double legL = 58; //步行姿态计算中的脚部零件长度，详见“姿态计算解析”
 int soundTriggerPin = 23; //定义超声波模块针脚位置
 int soundEchoPin = 22; //定义超声波模块针脚位置
-int count=0;
+int count = 0;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -52,92 +52,92 @@ void setup() {
   servo[12].attach(16, 500, 2500); //颈部舵机，插引脚16，对应校对参数为angleC16
   delay(100);
   delay(2000);
-  int part1 = 1, part2 = 1, turncount = 0, turn = -1,turn_dis=18;
-//  if (part1)
-//  {
-//    Serial.println("1");
-//    stand();
-//    delay(500);
-//    int mark = 1;
-//    while (1) {
-//      if (turncount == 3) {
-//        break;
-//      }
-//      servo[12].write(angleC16);
-//      delay(5);
-//      int Cdistance = CalculateDistance();//记录超声波测距数据
-//
-//      Serial.println(Cdistance);
-//      Serial.println();
-//      if (Cdistance > turn_dis) { //如果测距数据大于15cm则前进
-//
-//        if (Cdistance > 40)
-//        {
-//          if ( count!= 0)
-//          {
-//            balance();
-//          }
-//          servo[12].write(angleC16);
-//        }
-//        for (int i = 0; i < 5; i++)
-//        {
-//          servo[0].write(angleC2);
-//          servo[3].write(angleC12);
-//          servo[6].write(angleC15);
-//          servo[9].write(angleC27);
-//          runA();
-//          runB();
-//          runC();
-//          runD();
-//          Cdistance = CalculateDistance();
-//          if (Cdistance <= turn_dis)break;
-//        }
-//        count=1;
-//      } else if (Cdistance <= turn_dis) {              //如果测距数据小于15cm则转向，随机左转或右转
-//        int Rrdistance = RightDistance();   //记录超声波测距数据
-//        delay(300);
-//        int Lldistance = LeftDistance();   //记录超声波测距数据
-//        delay(300);
-//        Serial.print(Lldistance);
-//        Serial.print("|");
-//        Serial.println(Rrdistance);
-//        if (Lldistance > Rrdistance) {
-//          for (int i = 0; i < 8; i++) {
-//            delay(100);
-//            turnleft();
-//            
-//          } turn = 0; turncount++;
-//        }
-//        if (Lldistance < Rrdistance) {
-//          for (int i = 0; i < 4; i++) {
-//            delay(100);
-//            turnright();
-//          } turn = 1; turncount++;
-//         
-//        }
-//        servo[12].write(angleC16);
-//        delay(300);
-//        for (int i = 0; i < 5; i++)
-//          {
-//            servo[0].write(angleC2);
-//            servo[3].write(angleC12);
-//            servo[6].write(angleC15);
-//            servo[9].write(angleC27);
-//            runA();
-//            runB();
-//            runC();
-//            runD();
-//          }
-//        
-//      }
-//      stopaction();
-//    }
-//    part1 = 0;
-//    part2 = 1;
-//  }
-  part2=1;
-  delay(5000);
+  int part1 = 1, part2 = 1, turncount = 0, turn = -1, turn_dis = 18;
+  //  if (part1)
+  //  {
+  //    Serial.println("1");
+  //    stand();
+  //    delay(500);
+  //    int mark = 1;
+  //    while (1) {
+  //      if (turncount == 3) {
+  //        break;
+  //      }
+  //      servo[12].write(angleC16);
+  //      delay(5);
+  //      int Cdistance = CalculateDistance();//记录超声波测距数据
+  //
+  //      Serial.println(Cdistance);
+  //      Serial.println();
+  //      if (Cdistance > turn_dis) { //如果测距数据大于15cm则前进
+  //
+  //        if (Cdistance > 40)
+  //        {
+  //          if ( count!= 0)
+  //          {
+  //            balance();
+  //          }
+  //          servo[12].write(angleC16);
+  //        }
+  //        for (int i = 0; i < 5; i++)
+  //        {
+  //          servo[0].write(angleC2);
+  //          servo[3].write(angleC12);
+  //          servo[6].write(angleC15);
+  //          servo[9].write(angleC27);
+  //          runA();
+  //          runB();
+  //          runC();
+  //          runD();
+  //          Cdistance = CalculateDistance();
+  //          if (Cdistance <= turn_dis)break;
+  //        }
+  //        count=1;
+  //      } else if (Cdistance <= turn_dis) {              //如果测距数据小于15cm则转向，随机左转或右转
+  //        int Rrdistance = RightDistance();   //记录超声波测距数据
+  //        delay(300);
+  //        int Lldistance = LeftDistance();   //记录超声波测距数据
+  //        delay(300);
+  //        Serial.print(Lldistance);
+  //        Serial.print("|");
+  //        Serial.println(Rrdistance);
+  //        if (Lldistance > Rrdistance) {
+  //          for (int i = 0; i < 8; i++) {
+  //            delay(100);
+  //            turnleft();
+  //
+  //          } turn = 0; turncount++;
+  //        }
+  //        if (Lldistance < Rrdistance) {
+  //          for (int i = 0; i < 4; i++) {
+  //            delay(100);
+  //            turnright();
+  //          } turn = 1; turncount++;
+  //
+  //        }
+  //        servo[12].write(angleC16);
+  //        delay(300);
+  //        for (int i = 0; i < 5; i++)
+  //          {
+  //            servo[0].write(angleC2);
+  //            servo[3].write(angleC12);
+  //            servo[6].write(angleC15);
+  //            servo[9].write(angleC27);
+  //            runA();
+  //            runB();
+  //            runC();
+  //            runD();
+  //          }
+  //
+  //      }
+  //      stopaction();
+  //    }
+  //    part1 = 0;
+  //    part2 = 1;
+  //  }
+  part2 = 1;
   stand();
+  delay(1000);
   turn = 0;
   delay(500);
   if (part2)
@@ -179,7 +179,7 @@ void setup() {
         }
         break;
       }
-      for (int i = 0; i < 7; i++)
+      for (int i = 0; i < 5; i++)
       {
         servo[0].write(angleC2);
         servo[3].write(angleC12);
@@ -196,14 +196,14 @@ void setup() {
 
     if (turn == 0) //开头左转
     {
-      for (int i = 0; i < 4; i++) {
+      for (int i = 0; i < 3; i++) {
         delay(100);
         turnright();
       }
     }
     else
     {
-      for (int i = 0; i < 7; i++) {
+      for (int i = 0; i < 8; i++) {
         delay(100);
         turnleft();
       }
@@ -214,16 +214,17 @@ void setup() {
       if (juli >= 20)
       {
         balance();
-        for(int i = 0; i < 7; i++)
+        servo[12].write(angleC16);
+        for (int i = 0; i < 7; i++)
         {
-        servo[0].write(angleC2);
-        servo[3].write(angleC12);
-        servo[6].write(angleC15);
-        servo[9].write(angleC27);
-        runA();
-        runB();
-        runC();
-        runD();
+          servo[0].write(angleC2);
+          servo[3].write(angleC12);
+          servo[6].write(angleC15);
+          servo[9].write(angleC27);
+          runA();
+          runB();
+          runC();
+          runD();
         }
       }
       else
@@ -234,9 +235,9 @@ void setup() {
     }
     //走到黄色星星处
 
-    for (int i = 0; i < 14; i++) {
+    for (int i = 0; i < 7; i++) {
       delay(100);
-      turnleft();
+      turnright();
     }
 
     for (int i = 0; i < 5; i++)
@@ -265,8 +266,8 @@ void setup() {
     part2 = 0;
   }
 }
-void loop(){
- 
+void loop() {
+  
 }
 void balance()//判断是否偏离中心
 {
@@ -302,59 +303,59 @@ void runing(int x)//走
 }
 int LeftDistance()//左扭头测距
 {
-  int a[8]={0},max_=0,min_=10000,num=0;
+  int a[8] = {0}, max_ = 0, min_ = 10000, num = 0;
   svmoveb(12, angleC16 + 75);
-  int Ldistance=0;
+  int Ldistance = 0;
   unsigned long Time = millis();
   while (Time + 1500 > millis())
   {
     //if(Time+500<millis()&&Time+1500>millis()){Ldistance=CalculateDistance();}
     servo[12].write(angleC16 + 75);
-    if(num<7){
-      a[num++]=CalculateDistance();
+    if (num < 7) {
+      a[num++] = CalculateDistance();
       Serial.print("左侧：");
-      Serial.println(a[num-1]);
-      max_=(a[num-1]>max_)?a[num-1]:max_;
-      min_=(a[num-1]<min_)?a[num-1]:min_;
+      Serial.println(a[num - 1]);
+      max_ = (a[num - 1] > max_) ? a[num - 1] : max_;
+      min_ = (a[num - 1] < min_) ? a[num - 1] : min_;
     }
     delay(5);
   }
-  for(int i=0;i<7;i++){
-    Ldistance+=a[i];
+  for (int i = 0; i < 7; i++) {
+    Ldistance += a[i];
   }
-  Ldistance-=min_;
-  Ldistance-=max_;
-  Ldistance/=5;
+  Ldistance -= min_;
+  Ldistance -= max_;
+  Ldistance /= 5;
   Serial.println(Ldistance);
   svmoveb(12, angleC16);
   return Ldistance;
 }
 int RightDistance()//右扭头测距
 {
-  int a[7]={0},max_=0,min_=10000,num=0;
+  int a[7] = {0}, max_ = 0, min_ = 10000, num = 0;
   svmovea(12, angleC16 - 75);
-  int Rdistance=0;
+  int Rdistance = 0;
   unsigned long Time = millis();
   while (Time + 1500 > millis())
   {
     //if(Time+500<millis()&&Time+1500>millis()){Rdistance=CalculateDistance();}
     servo[12].write(angleC16 - 75);
-    if(num<7){
-      a[num++]=CalculateDistance();
+    if (num < 7) {
+      a[num++] = CalculateDistance();
       Serial.print("右侧：");
-      Serial.println(a[num-1]);
-      max_=(a[num-1]>max_)?a[num-1]:max_;
-      min_=(a[num-1]<min_)?a[num-1]:min_;
+      Serial.println(a[num - 1]);
+      max_ = (a[num - 1] > max_) ? a[num - 1] : max_;
+      min_ = (a[num - 1] < min_) ? a[num - 1] : min_;
     }
     delay(5);
   }
-  
-  for(int i=0;i<7;i++){
-    Rdistance+=a[i];
+
+  for (int i = 0; i < 7; i++) {
+    Rdistance += a[i];
   }
-  Rdistance-=min_;
-  Rdistance-=max_;
-  Rdistance/=5;
+  Rdistance -= min_;
+  Rdistance -= max_;
+  Rdistance /= 5;
   Serial.println(Rdistance);
   svmoveb(12, angleC16);
   return Rdistance;
@@ -386,9 +387,9 @@ int CalculateDistance()   //超声波模块测距，套用官方代码，返回�
   float distance = duration * 0.017F;
   return int(distance);
 }
-int Cal_avg(){
-  int a,b,c,d,e,f,g;
-  
+int Cal_avg() {
+  int a, b, c, d, e, f, g;
+
 }
 void svmovea(int sv, int angleA)
 {
