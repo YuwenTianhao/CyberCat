@@ -166,7 +166,7 @@ void setup() {
       }
       else if (left > 50 && right > 50)
       {
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 5; i++)
         {
           servo[0].write(angleC2);
           servo[3].write(angleC12);
@@ -196,7 +196,7 @@ void setup() {
 
     if (turn == 0) //开头左转
     {
-      for (int i = 0; i < 5; i++) {
+      for (int i = 0; i < 3; i++) {
         delay(100);
         turnright();
       }
