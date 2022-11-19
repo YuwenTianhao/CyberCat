@@ -138,6 +138,7 @@ void setup() {
   part2=1;
   delay(5000);
   stand();
+  turn = 0;
   delay(500);
   if (part2)
   {
