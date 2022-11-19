@@ -196,7 +196,7 @@ void setup() {
 
     if (turn == 0) //开头左转
     {
-      for (int i = 0; i < 3; i++) {
+      for (int i = 0; i < 5; i++) {
         delay(100);
         turnright();
       }
