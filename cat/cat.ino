@@ -261,7 +261,7 @@ void setup() {
       turnright();
     }
 
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 7; i++)
     {
       balance();
       servo[12].write(angleC16);
