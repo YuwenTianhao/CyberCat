@@ -224,7 +224,7 @@ void setup() {
     while (1)
     {
       double juli = CalculateDistance();
-      if (juli >= 30)
+      if (juli >= 25)
       {
         balance();
         servo[12].write(angleC16);
@@ -239,7 +239,7 @@ void setup() {
           runC();
           runD();
           juli = CalculateDistance();
-          if(juli<=30){
+          if(juli<=25){
             break;
           }
         }
