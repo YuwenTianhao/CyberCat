@@ -52,7 +52,7 @@ void setup() {
   servo[12].attach(16, 500, 2500); //颈部舵机，插引脚16，对应校对参数为angleC16
   delay(100);
   delay(2000);
-  int part1 = 1, part2 = 1, turncount = 0, turn = -1,turn_dis=20;
+  int part1 = 1, part2 = 1, turncount = 0, turn = -1,turn_dis=18;
   if (part1)
   {
     Serial.println("1");
