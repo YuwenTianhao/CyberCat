@@ -94,9 +94,9 @@ void setup() {
         }
         count=1;
       } else if (Cdistance <= 15) {              //如果测距数据小于15cm则转向，随机左转或右转
-        int Rrdistance = RDistance();   //记录超声波测距数据
+        int Rrdistance = RightDistance();   //记录超声波测距数据
         delay(300);
-        int Lldistance = LDistance();   //记录超声波测距数据
+        int Lldistance = LeftDistance();   //记录超声波测距数据
         delay(300);
         Serial.print(Lldistance);
         Serial.print("|");
@@ -271,6 +271,8 @@ void balance()//判断是否偏离中心
   {
     delay(100);
     turnleft();
+    delay(100);
+    turnleft();
   }
   else if (right - left > 10)
   {
@@ -294,7 +296,8 @@ void runing(int x)//走
   }
 }
 int LeftDistance()//左扭头测距
-{int a[7]={0},max_=0,min_=10000,num=0;
+{
+  int a[8]={0},max_=0,min_=10000,num=0;
   svmoveb(12, angleC16 + 75);
   int Ldistance;
   unsigned long Time = millis();
@@ -302,8 +305,10 @@ int LeftDistance()//左扭头测距
   {
     //if(Time+500<millis()&&Time+1500>millis()){Ldistance=CalculateDistance();}
     servo[12].write(angleC16 + 75);
-    if(num<7);{
+    if(num<7){
       a[num++]=CalculateDistance();
+      Serial.print("右侧：");
+      Serial.println(a[num-1]);
       max_=(a[num-1]>max_)?a[num-1]:max_;
       min_=(a[num-1]<min_)?a[num-1]:min_;
     }
@@ -320,7 +325,8 @@ int LeftDistance()//左扭头测距
   return Ldistance;
 }
 int RightDistance()//右扭头测距
-{int a[7]={0},max_=0,min_=10000,num=0;
+{
+  int a[7]={0},max_=0,min_=10000,num=0;
   svmovea(12, angleC16 - 75);
   int Rdistance;
   unsigned long Time = millis();
@@ -328,8 +334,10 @@ int RightDistance()//右扭头测距
   {
     //if(Time+500<millis()&&Time+1500>millis()){Rdistance=CalculateDistance();}
     servo[12].write(angleC16 - 75);
-    if(num<7);{
+    if(num<7){
       a[num++]=CalculateDistance();
+      Serial.print("右侧：");
+      Serial.println(a[num-1]);
       max_=(a[num-1]>max_)?a[num-1]:max_;
       min_=(a[num-1]<min_)?a[num-1]:min_;
     }
@@ -345,43 +353,11 @@ int RightDistance()//右扭头测距
   Serial.println(Rdistance);
   svmoveb(12, angleC16);
   return Rdistance;
-  
 }
-int LDistance()//左扭头测距
-{
-  svmoveb(12, angleC16 + 75 );
-  int Ldistance;
-  unsigned long Time = millis();
-  while (Time + 1500 > millis())
-  {
-    //if(Time+500<millis()&&Time+1500>millis()){Ldistance=CalculateDistance();}
-    servo[12].write(angleC16 + 75 );
-    delay(5);
-  }
-  Ldistance = CalculateDistance();
-  Serial.println(Ldistance);
-  svmovea(12, angleC16);
-  return Ldistance;
-}
-int RDistance()//右扭头测距,保存的原始版本
-{
-  svmovea(12, angleC16 - 75);
-  int Rdistance;
-  unsigned long Time = millis();
-  while (Time + 1500 > millis())
-  {
-    //if(Time+500<millis()&&Time+1500>millis()){Rdistance=CalculateDistance();}
-    servo[12].write(angleC16 - 75);
-    delay(5);
-  }
-  Rdistance = CalculateDistance();
-  Serial.println(Rdistance);
-  svmoveb(12, angleC16);
-  return Rdistance;
-}
+
 void leftturn()
 {
-  for (int i = 0; i < 6; i++)
+  for (int i = 0; i < 7; i++)
   {
     delay(100);
     turnleft();
