@@ -244,7 +244,7 @@ void setup() {
     {
       balance();
       servo[12].write(angleC16);
-      for (i = 0; i < 10; i++)
+      for (int j = 0; j < 7; j++)
       {
         servo[0].write(angleC2);
         servo[3].write(angleC12);
