@@ -262,7 +262,24 @@ void setup() {
 
     for (int i = 0; i < 8; i++)
     {
-      balance();
+      int RD = RightDistance();
+      int LD = LeftDistance();
+      servo[12].write(angleC16);
+      if (RD < 60 || LD < 60)
+      {
+        if (LD - RD > 10)
+        {
+          delay(50);
+          turnleft();
+          delay(50);
+          turnleft();
+        }
+        else if (RD - LD > 10)
+        {
+          delay(50);
+          turnright();
+        }
+      }
       servo[12].write(angleC16);
       for (int j = 0; j < 7; j++)
       {
@@ -325,6 +342,7 @@ void runing(int x)//走
 int LeftDistance()//左扭头测距
 {
   int a[8] = {0}, max_ = 0, min_ = 10000, num = 0;
+  int m = 0;
   svmoveb(12, angleC16 + 75);
   int Ldistance = 0;
   unsigned long Time = millis();
@@ -347,11 +365,14 @@ int LeftDistance()//左扭头测距
     delay(5);
   }
   for (int i = 0; i < 7; i++) {
-    Ldistance += a[i];
+    if(a[i]<500){
+      Ldistance += a[i];
+      m++;
+    }
   }
   Ldistance -= min_;
   Ldistance -= max_;
-  Ldistance /= 5;
+  Ldistance /= m;
   Serial.println(Ldistance);
   svmoveb(12, angleC16);
   return Ldistance;
@@ -359,6 +380,7 @@ int LeftDistance()//左扭头测距
 int RightDistance()//右扭头测距
 {
   int a[7] = {0}, max_ = 0, min_ = 10000, num = 0;
+  int m = 0;
   svmovea(12, angleC16 - 75);
   int Rdistance = 0;
   unsigned long Time = millis();
@@ -382,11 +404,14 @@ int RightDistance()//右扭头测距
   }
 
   for (int i = 0; i < 7; i++) {
-    Rdistance += a[i];
+    if(a[i]<500){
+      m++;
+      Rdistance += a[i];
+    }
   }
   Rdistance -= min_;
   Rdistance -= max_;
-  Rdistance /= 5;
+  Rdistance /= m;
   Serial.println(Rdistance);
   svmoveb(12, angleC16);
   return Rdistance;
